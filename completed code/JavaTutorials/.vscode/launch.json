@@ -1,0 +1,92 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - GetBlock",
+            "request": "launch",
+            "mainClass": "com.algorand.javatest.GetBlock",
+            "projectName": "java-test"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        }
+    ]
+}
+
+        // {
+        //     "type": "java",
+        //     "name": "CodeLens (Launch) - Main",
+        //     "request": "launch",
+        //     "mainClass": "com.algorand.myjavademo.Main",
+        //     "projectName": "java-test"
+        // },
+        //     {
+        //         "type": "java",
+        //         "name": "CodeLens (Launch) - SubmitFromFile",
+        //         "request": "launch",
+        //         "mainClass": "com.algorand.javatest.SubmitFromFile",
+        //         "projectName": "java-test"
+        //     },
+        //     {
+        //         "type": "java",
+        //         "name": "CodeLens (Launch) - SignOffline",
+        //         "request": "launch",
+        //         "mainClass": "com.algorand.javatest.SignOffline",
+        //         "projectName": "java-test"
+        //     },
+        //     {
+        //         "type": "java",
+        //         "name": "CodeLens (Launch) - Restore Wallet",
+        //         "request": "launch",
+        //         "mainClass": "com.algorand.javatest.RestoreWallet",
+        //         "projectName": "java-test"
+        //     },
+        //     {
+        //         "type": "java",
+        //         "name": "CodeLens (Launch) - SignAndSubmit",
+        //         "request": "launch",
+        //         "mainClass": "com.algorand.javatest.SignAndSubmit",
+        //         "projectName": "java-test"
+        //     },
+        //     {
+        //         "type": "java",
+        //         "name": "CodeLens (Launch) - BackupWallet",
+        //         "request": "launch",
+        //         "mainClass": "com.algorand.javatest.BackupWallet",
+        //         "projectName": "java-test"
+        //     },
+        //     {
+        //         "type": "java",
+        //         "name": "CodeLens (Launch) - NewWallet",
+        //         "request": "launch",
+        //         "mainClass": "com.algorand.javatest.NewWallet",
+        //         "projectName": "java-test"
+        //     },
+        //     {
+        //         "type": "java",
+        //         "name": "CodeLens (Launch) - GetAccountTransactions",
+        //         "request": "launch",
+        //         "mainClass": "com.algorand.javatest.GetAccountTransactions",
+        //         "projectName": "java-test"
+        //     },
+        //     {
+        //         "type": "java",
+        //         "name": "CodeLens (Launch) - GetBlock",
+        //         "request": "launch",
+        //         "mainClass": "com.algorand.javatest.GetBlock",
+        //         "projectName": "java-test"
+        //     },
+        //     {
+        //         "type": "java",
+        //         "name": "CodeLens (Launch) - AccountTest",
+        //         "request": "launch",
+        //         "mainClass": "com.algorand.javatest.AccountTest",
+        //         "projectName": "java-test"
+        //     },
