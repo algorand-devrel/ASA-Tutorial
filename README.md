@@ -1,5 +1,5 @@
-# Algorand-Standard-Assets---ASA---Turorial
-Completed code solutions for ASA Tutorial
+# ASA-Turorial
+Completed code solutions for Algorand Standard Assets (ASA) Tutorial
 (beta - link to follow for tutorial)
 
 SDK Install Notes:
