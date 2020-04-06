@@ -15,9 +15,13 @@ import (
 
 //const algodAddress = "ADDRESS"
 //const algodToken = "TOKEN"
+// hackathon
+// const algodAddress = "http://hackathon.algodev.network:9100"
+// const algodToken = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
+// sandbox
 
-const algodAddress = "http://hackathon.algodev.network:9100"
-const algodToken = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
+const algodAddress = "http://localhost:4001"
+const algodToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 var txHeaders = append([]*algod.Header{}, &algod.Header{"Content-Type", "application/json"})
 
@@ -25,28 +29,30 @@ var txHeaders = append([]*algod.Header{}, &algod.Header{"Content-Type", "applica
 func loadAccounts() (map[int][]byte, map[int]string) {
 	// Shown for demonstration purposes. NEVER reveal secret mnemonics in practice.
 	// Change these values to uese the accounts created in Step 1A.
-		var pks = map[int]string{
-		1: "Account Address 1 from Step 1A",
-		2: "Account Address 2 from Step 1A",
-		3: "Account Address 3 from Step 1A",
-	}
-	// Paste in mnemonic phrases for all three accounts from Step 1A	
-	mnemonic1 := "PASTE your phrase for account 1 from Step 1A"
-	mnemonic2 := "PASTE your phrase for account 2 from Step 1A"
-	mnemonic3 := "PASTE your phrase for account 2 from Step 1A"
-	
+
 	// var pks = map[int]string{
-	// 	1: "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM",
-	// 	2: "AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU",
-	// 	3: "3ZQ3SHCYIKSGK7MTZ7PE7S6EDOFWLKDQ6RYYVMT7OHNQ4UJ774LE52AQCU",
+	// 	1: "Account Address 1",
+	// 	2: "Account Address 2",
+	// 	3: "Account Address 3",
 	// }
 
+	// Paste in mnemonic phrases for all three accounts from Step 1A
+	// mnemonic1 := "PASTE your phrase for account 1"
+	// mnemonic2 := "PASTE your phrase for account 2"
+	// mnemonic3 := "PASTE your phrase for account 3"
 
-	// mnemonic1 := "portion never forward pill lunch organ biology weird catch curve isolate plug innocent skin grunt bounce clown mercy hole eagle soul chunk type absorb trim"
-	// mnemonic2 := "place blouse sad pigeon wing warrior wild script problem team blouse camp soldier breeze twist mother vanish public glass code arrow execute convince ability there"
-	// mnemonic3 := "image travel claw climb bottom spot path roast century also task cherry address curious save item clean theme amateur loyal apart hybrid steak about blanket"
+	var pks = map[int]string{
+		1: "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM",
+		2: "AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU",
+		3: "3ZQ3SHCYIKSGK7MTZ7PE7S6EDOFWLKDQ6RYYVMT7OHNQ4UJ774LE52AQCU",
+	}
+
+	mnemonic1 := "portion never forward pill lunch organ biology weird catch curve isolate plug innocent skin grunt bounce clown mercy hole eagle soul chunk type absorb trim"
+	mnemonic2 := "place blouse sad pigeon wing warrior wild script problem team blouse camp soldier breeze twist mother vanish public glass code arrow execute convince ability there"
+	mnemonic3 := "image travel claw climb bottom spot path roast century also task cherry address curious save item clean theme amateur loyal apart hybrid steak about blanket"
 
 	mnemonics := []string{mnemonic1, mnemonic2, mnemonic3}
+	addr := []string{addr1, addr2, addr3}
 	var sks = make(map[int][]byte)
 	for i, m := range mnemonics {
 		var err error
@@ -57,6 +63,7 @@ func loadAccounts() (map[int][]byte, map[int]string) {
 			fmt.Printf("Loaded Key %d: %s\n", i+1, pks[i+1])
 		}
 	}
+
 	return sks, pks
 }
 
