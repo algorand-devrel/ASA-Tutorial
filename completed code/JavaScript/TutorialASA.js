@@ -9,23 +9,15 @@ const algosdk = require('algosdk');
 // const server = "SERVER";
 // const port = PORT;
 
-
-// or use values from PureStake API service https://www.purestake.com/
-// or use the sandbox at https://github.com/algorand/sandbox
-// or use the hackathon standup instance values
+//hackathon
 // const token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1";
 // const server = "http://hackathon.algodev.network";
 // const port = 9100;
 
-// UPDATE THESE VALUES
-// const token = "TOKEN";
-// const server = "SERVER";
-// const port = PORT;
-
-//hackathon
-const token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1";
-const server = "http://hackathon.algodev.network";
-const port = 9100;
+// sandbox
+const token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+const server = "http://localhost";
+const port = 4001;
 
 // Structure for changing blockchain params
 var cp = {
@@ -47,23 +39,27 @@ var getChangingParms = async function (algodclient) {
 }
 
 // Function used to wait for a tx confirmation
-var waitForConfirmation = async function (algodclient, txId) {
+
+const waitForConfirmation = async function (algodclient, txId) {
+    let lastround = (await algodclient.status()).lastRound;
     while (true) {
-        b3 = await algodclient.pendingTransactionInformation(txId);
-        if (b3.round != null && b3.round > 0) {
+        const pendingInfo = await algodclient.pendingTransactionInformation(txId);
+        if (pendingInfo.round !== null && pendingInfo.round > 0) {
             //Got the completed Transaction
-            console.log("Transaction " + b3.tx + " confirmed in round " + b3.round);
+            console.log("Transaction " + pendingInfo.tx + " confirmed in round " + pendingInfo.round);
             break;
         }
+        lastround++;
+        await algodclient.statusAfterBlock(lastround);
     }
 };
 
-// Recover accounts created in Step 1A
+// Recover accounts
 // paste in mnemonic phrases here for each account
 
-// var account1_mnemonic = "PASTE your phrase for account 1 from Step 1A";
-// var account2_mnemonic = "PASTE your phrase for account 2 from Step 1A";
-// var account3_mnemonic = "PASTE your phrase for account 3 from Step 1A"
+// var account1_mnemonic = "PASTE your phrase for account 1";
+// var account2_mnemonic = "PASTE your phrase for account 2";
+// var account3_mnemonic = "PASTE your phrase for account 3"
 
 var account1_mnemonic = "portion never forward pill lunch organ biology" +
     " weird catch curve isolate plug innocent skin grunt" +
@@ -106,7 +102,7 @@ let algodclient = new algosdk.Algod(token, server, port);
     await getChangingParms(algodclient);
     let note = undefined; // arbitrary data to be stored in the transaction; here, none is stored
 
-    //Asset creation specific parameters
+    // Asset creation specific parameters
     // The following parameters are asset specific
     // Throughout the example these will be re-used. 
     // We will also change the manager later in the example
@@ -160,7 +156,7 @@ let algodclient = new algosdk.Algod(token, server, port);
     // Transaction RXSAJUYVPDWUF4XNGA2VYQX3NUVT5YJEZZ5SJXIIASZK5M55LVVQ confirmed in round 4272786
     // AssetID = 149657
 
-    // add this code after console.log("AssetID = " + assetID);
+
     // Change Asset Configuration:
     // Change the manager using an asset configuration transaction
 
@@ -192,7 +188,7 @@ let algodclient = new algosdk.Algod(token, server, port);
     //The manager should now be the same as the creator
 
     console.log(assetInfo);
-// Asset info should look similar to this in the Terminal Output:
+    // Asset info should look similar to this in the Terminal Output:
     // Transaction: QGXMMYIKRV3TE3NWCL6FVNJQ3DCODML3GBC3BR4TSB3D6S3YQVCQ
     // Transaction QGXMMYIKRV3TE3NWCL6FVNJQ3DCODML3GBC3BR4TSB3D6S3YQVCQ confirmed in round 4273376
     // {
@@ -210,7 +206,6 @@ let algodclient = new algosdk.Algod(token, server, port);
     //     clawbackaddr: 'AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU'
     // }    
 
-// insert this code after Step 3 code
     // Opting in to an Asset:
     // Opting in to transact with the new asset
     // Allow accounts that want recieve the new asset
@@ -249,12 +244,10 @@ let algodclient = new algosdk.Algod(token, server, port);
     act = await algodclient.accountInformation(recoveredAccount3.addr);
     console.log("Account Information for: " + JSON.stringify(act.assets[assetID]));
 
-// your console/terminal out put should look as follows
+//   your console/terminal out put should look as follows
 //   Transaction YT2U2WWBUWB4P54M24OUCMIIN3VDZ64LIDCBMED6AGQIQZKT6PTQ confirmed in round 4273745
 //   Account Information for: { "creator": "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM", "amount": 0, "frozen": false }
 
-
-// add this code after Step 4's code 
   
     // Transfer New Asset:
     // Now that account3 can recieve the new tokens 
@@ -291,9 +284,9 @@ let algodclient = new algosdk.Algod(token, server, port);
 //    Account Information for: { "creator": "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM", "amount": 10, "frozen": false }
 
 
-// insert this code after Step 5's code
+    // freeze asset
  
-// The asset was created and configured to allow freezing an account
+    // The asset was created and configured to allow freezing an account
     // If the freeze address is set "", it will no longer be possible to do this.
     // In this example we will now freeze account3 from transacting with the 
     // The newly created asset. 
@@ -330,7 +323,6 @@ let algodclient = new algosdk.Algod(token, server, port);
 //    Account Information for: { "creator": "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM", "amount": 10, "frozen": true }
 
 
-//insert this code after Step 6's code
     // Revoke an Asset:
     // The asset was also created with the ability for it to be revoked by 
     // the clawbackaddress. If the asset was created or configured by the manager
@@ -374,8 +366,6 @@ let algodclient = new algosdk.Algod(token, server, port);
     //Asset ID: 149774
     //Account Information for: { "creator": "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM", "amount": 0, "frozen": true }
     
-
-    //insert this code after Step 7's code
     
     // Destroy and Asset:
     // All of the created assets should now be back in the creators

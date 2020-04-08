@@ -64,6 +64,7 @@ public class TutorialASA {
         }
 
     }
+    
 
     // Utility function to update changing block parameters
     public static ChangingBlockParms getChangingParms(final AlgodApi algodApiInstance) throws Exception {
