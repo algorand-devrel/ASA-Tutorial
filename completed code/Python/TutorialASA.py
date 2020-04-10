@@ -2,10 +2,10 @@ import json
 from algosdk import account, algod, mnemonic, transaction
 
 # Shown for demonstration purposes. NEVER reveal secret mnemonics in practice.
-# Change these values with the mnemonics from Step 1A
-# mnemonic1 = "PASTE your phrase for account 1 from Step 1A"
-# mnemonic2 = "PASTE your phrase for account 2 from Step 1A"
-# mnemonic3 = "PASTE your phrase for account 3 from Step 1A"
+# Change these values with your mnemonics
+# mnemonic1 = "PASTE your phrase for account 1"
+# mnemonic2 = "PASTE your phrase for account 2"
+# mnemonic3 = "PASTE your phrase for account 3"
 
 
 
@@ -28,8 +28,11 @@ for m in [mnemonic1, mnemonic2, mnemonic3]:
 # algod_address = ""  # ADD ADDRESS
 # algod_token = ""  # ADD TOKEN
 
-algod_address = "http://hackathon.algodev.network:9100"
-algod_token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
+# algod_address = "http://hackathon.algodev.network:9100"
+# algod_token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
+
+algod_address = "http://localhost:4001"
+algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 
 # Initialize an algod client
@@ -45,12 +48,18 @@ min_fee = params.get("minFee")
 
 # Utility function to wait for a transaction to be confirmed by network
 
-
 def wait_for_tx_confirmation(txid):
-    """Wait until the transaction's round info is confirmed, i.e. no longer 0"""
-    pendinginfo = algod_client.pending_transaction_info(txid)
-    while pendinginfo['round'] == 0:
-        pendinginfo = algod_client.pending_transaction_info(txid)
+   last_round = algod_client.status().get('lastRound')
+   while True:
+       txinfo = algod_client.pending_transaction_info(txid)
+       if txinfo.get('round') and txinfo.get('round') > 0:
+           print("Transaction {} confirmed in round {}.".format(
+               txid, txinfo.get('round')))
+           break
+       else:
+           print("Waiting for confirmation...")
+           last_round += 1
+           algod_client.status_after_block(last_round)
 
 
 print("Account 1 address: {}".format(accounts[1]['pk']))
@@ -65,7 +74,6 @@ print("Account 3 address: {}".format(accounts[3]['pk']))
 
 # Configure fields for creating the asset.
 
-# insert after step 1 code
 # Account 1 creates an asset called latinum and sets Account 2 as the manager, reserve, freeze, and clawback address.
 
 data = {
@@ -133,10 +141,13 @@ except Exception as e:
 #     "clawbackaddr": "AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU"
 # }
 
-# insert after Step 2 code
+
 # Update manager address.
+
 # The current manager(Account 2) issues an asset configuration transaction that assigns Account 1 as the new manager.
 # Keep reserve, freeze, and clawback address same as before, i.e. account 2
+
+# asset_id = 328952;
 data = {
     "sender": accounts[2]['pk'],
     "fee": min_fee,
@@ -179,9 +190,8 @@ print(json.dumps(asset_info, indent=4))
 #     "clawbackaddr": "AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU"
 # }
 
-# insert after Step 3 code
-
-# Check if asset_id is in account 2's asset holdings prior to opt-in
+# opt-in
+# Check if asset_id is in account 3's asset holdings prior to opt-in
 account_info = algod_client.account_info(accounts[3]['pk'])
 holding = None
 if 'assets' in account_info:
@@ -201,7 +211,7 @@ if not holding:
         "flat_fee": True
     }
 
-    # Use the AssetTransferTxn class to transfer assets
+    # Use the AssetTransferTxn class to transfer assets and opt-in
     txn = transaction.AssetTransferTxn(**data)
     stxn = txn.sign(accounts[3]['sk'])
     txid = algod_client.send_transaction(stxn)
@@ -222,9 +232,8 @@ if not holding:
 #     "frozen": false
 # }
 
-# insert after Step 4 code
 
-# transfer asset from account 1 to account 3
+# transfer asset of 10 from account 1 to account 3
 data = {
     "sender": accounts[1]['pk'],
     "fee": min_fee,
@@ -256,7 +265,7 @@ print(json.dumps(account_info['assets'][str(asset_id)], indent=4))
 #     "frozen": false
 # }
 
-# insert code after Step 5
+# Freeze asset
 # The freeze address (Account 2) freezes Account 3's latinum holdings.
 data = {
     "sender": accounts[2]['pk'],
@@ -280,7 +289,7 @@ account_info = algod_client.account_info(accounts[3]['pk'])
 print(json.dumps(account_info['assets'][str(asset_id)], indent=4))
 
 
-# terminal output should look similar to this...
+# terminal output should look similar to this wih a frozen value of true...
 # ZRSYHNYRMF3A2HCHWN4RKDFLMCOF6TASFGSKQSJZP4XZN3KZGOJA
 # {
 #     "creator": "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM",
@@ -288,7 +297,7 @@ print(json.dumps(account_info['assets'][str(asset_id)], indent=4))
 #     "frozen": true
 # }
 
-# insert after Step 6 code
+# Revoke asset
 # The clawback address (Account 2) revokes 10 latinum from Account 3 and places it back with Account 1.
 data = {
     "sender": accounts[2]['pk'],
@@ -311,26 +320,30 @@ print(txid)
 wait_for_tx_confirmation(txid)
 # The balance of account 3 should now be 0.
 account_info = algod_client.account_info(accounts[3]['pk'])
+print("Account 3")
 print(json.dumps(account_info['assets'][str(asset_id)], indent=4))
 # The balance of account 1 should increase by 10 to 1000.
+print("Account 1")
 account_info = algod_client.account_info(accounts[1]['pk'])
 print(json.dumps(account_info['assets'][str(asset_id)], indent=4))
 
 # terminal output should be similar to..
 
 # 3BAJ6EO6V5EVQRUO6BDGBUXKQVWTQ7AFXRRSDQHWE7Q6QANDFVOQ
+# Account 3
 # {
 #     "creator": "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM",
 #     "amount": 0,
 #     "frozen": true
 # }
+# Account 1
 # {
 #     "creator": "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM",
 #     "amount": 1000,
 #     "frozen": false
 # }
 
-# insert code after Step 7's code]
+# Destroy Asset
 # With all assets back in the creator's account,
 # the manaager (Account 1) destroys the asset.
 
@@ -357,8 +370,6 @@ print(txid)
 
 # Wait for the transaction to be confirmed
 wait_for_tx_confirmation(txid)
-
-
 
 # This should raise an exception since the asset was deleted.
 try:

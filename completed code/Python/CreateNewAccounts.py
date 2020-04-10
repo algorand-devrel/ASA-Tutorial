@@ -1,7 +1,6 @@
 import json
 from algosdk import account, mnemonic
 
-
 acct = account.generate_account()
 address1 = acct[1]
 print("Account 1")
@@ -21,7 +20,7 @@ print(address3)
 mnemonic3 = mnemonic.from_private_key(acct[0])
 print ("")
 print("Copy off accounts above and add TestNet Algo funds using the TestNet Dispenser at https://bank.testnet.algorand.network/")
-print("copy off the following mnemonic code for use in Step 1B")
+print("copy off the following mnemonic code for use later")
 print("")
 print("mnemonic1 = \"{}\"".format(mnemonic1))
 print("mnemonic2 = \"{}\"".format(mnemonic2))
@@ -36,8 +35,9 @@ print("mnemonic3 = \"{}\"".format(mnemonic3))
 # Account 3
 # TABDMZ2EUTNOR3S74SJWW37DLHE7BDGS5XB5JPLFQ2VQVJOE2DXKX722VU
 
-# Copy off accounts above and add TestNet Algo funds using the TestNet Dispenser at https: // bank.testnet.algorand.network/
-# copy off the following mnemonic code for use in Step 1B
+# Copy off accounts above and add TestNet Algo funds using the TestNet Dispenser at
+# https: // bank.testnet.algorand.network/
+# copy off the following mnemonic code for use later
 
 # mnemonic1 = "consider round clerk soldier hurt dynamic floor video output spoon deliver virtual zoo inspire rubber doll nose warfare improve abstract recall choice size above actor"
 # mnemonic2 = "boil explain enlist adapt science hub universe knife ghost scheme lazy payment must gas coconut forget goddess author filter civil tumble antique delay absorb lend"
