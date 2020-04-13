@@ -8,6 +8,10 @@ import (
 	"github.com/algorand/go-algorand-sdk/client/algod"
 )
 
+// 
+// const algodAddress = "Your Address"
+// const algodToken = "Your Token"
+
 const algodAddress = "http://localhost:4001"
 const algodToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 var txHeaders = append([]*algod.Header{}, &algod.Header{"Content-Type", "application/json"})

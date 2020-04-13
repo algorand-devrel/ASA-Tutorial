@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/ed25519"
 	b64 "encoding/base64"
 	json "encoding/json"
 	"fmt"
@@ -9,17 +10,19 @@ import (
 	"github.com/algorand/go-algorand-sdk/crypto"
 	"github.com/algorand/go-algorand-sdk/mnemonic"
 	"github.com/algorand/go-algorand-sdk/transaction"
+	"github.com/algorand/go-algorand-sdk/types"
 )
 
 // UPDATE THESE VALUES
 
-//const algodAddress = "ADDRESS"
-//const algodToken = "TOKEN"
+// const algodAddress = "Your ADDRESS"
+// const algodToken = "Your TOKEN"
+
 // hackathon
 // const algodAddress = "http://hackathon.algodev.network:9100"
 // const algodToken = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1"
-// sandbox
 
+// sandbox
 const algodAddress = "http://localhost:4001"
 const algodToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
@@ -28,57 +31,59 @@ var txHeaders = append([]*algod.Header{}, &algod.Header{"Content-Type", "applica
 // Accounts to be used through examples
 func loadAccounts() (map[int][]byte, map[int]string) {
 	// Shown for demonstration purposes. NEVER reveal secret mnemonics in practice.
-	// Change these values to uese the accounts created in Step 1A.
+	// Change these values to use the accounts created previously.
 
-	// var pks = map[int]string{
-	// 	1: "Account Address 1",
-	// 	2: "Account Address 2",
-	// 	3: "Account Address 3",
-	// }
-
-	// Paste in mnemonic phrases for all three accounts from Step 1A
+	// Paste in mnemonic phrases for all three accounts
 	// mnemonic1 := "PASTE your phrase for account 1"
 	// mnemonic2 := "PASTE your phrase for account 2"
 	// mnemonic3 := "PASTE your phrase for account 3"
-
-	var pks = map[int]string{
-		1: "THQHGD4HEESOPSJJYYF34MWKOI57HXBX4XR63EPBKCWPOJG5KUPDJ7QJCM",
-		2: "AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU",
-		3: "3ZQ3SHCYIKSGK7MTZ7PE7S6EDOFWLKDQ6RYYVMT7OHNQ4UJ774LE52AQCU",
-	}
 
 	mnemonic1 := "portion never forward pill lunch organ biology weird catch curve isolate plug innocent skin grunt bounce clown mercy hole eagle soul chunk type absorb trim"
 	mnemonic2 := "place blouse sad pigeon wing warrior wild script problem team blouse camp soldier breeze twist mother vanish public glass code arrow execute convince ability there"
 	mnemonic3 := "image travel claw climb bottom spot path roast century also task cherry address curious save item clean theme amateur loyal apart hybrid steak about blanket"
 
 	mnemonics := []string{mnemonic1, mnemonic2, mnemonic3}
-	addr := []string{addr1, addr2, addr3}
+	pks := map[int]string{1: "", 2: "", 3: ""}
 	var sks = make(map[int][]byte)
+
 	for i, m := range mnemonics {
 		var err error
-		sks[i+1], err = mnemonic.ToPrivateKey(m)
+		sk, err := mnemonic.ToPrivateKey(m)
+		sks[i+1] = sk
 		if err != nil {
 			fmt.Printf("Issue with account %d private key conversion.", i+1)
-		} else {
-			fmt.Printf("Loaded Key %d: %s\n", i+1, pks[i+1])
 		}
+		// derive public address from Secret Key.
+		pk := sk.Public()
+		var a types.Address
+		cpk := pk.(ed25519.PublicKey)
+		copy(a[:], cpk[:])
+		pks[i+1] = a.String()
+		fmt.Printf("Loaded Key %d: %s\n", i+1, pks[i+1])
 	}
-
 	return sks, pks
 }
 
 // Function that waits for a given txId to be confirmed by the network
 func waitForConfirmation(algodClient algod.Client, txID string) {
+	nodeStatus, err := algodClient.Status()
+	if err != nil {
+		fmt.Printf("error getting algod status: %s\n", err)
+		return
+	}
+	lastRound := nodeStatus.LastRound
 	for {
-		b3, err := algodClient.PendingTransactionInformation(txID, txHeaders...)
+		pt, err := algodClient.PendingTransactionInformation(txID)
 		if err != nil {
 			fmt.Printf("waiting for confirmation... (pool error, if any): %s\n", err)
 			continue
 		}
-		if b3.ConfirmedRound > 0 {
-			fmt.Printf("Transaction "+b3.TxID+" confirmed in round %d\n", b3.ConfirmedRound)
+		if pt.ConfirmedRound > 0 {
+			fmt.Printf("Transaction "+pt.TxID+" confirmed in round %d\n", pt.ConfirmedRound)
 			break
 		}
+		lastRound++
+		algodClient.StatusAfterBlock(lastRound)
 	}
 }
 
@@ -140,8 +145,6 @@ func main() {
 	// 	"2": "AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU",
 	// 	"3": "3ZQ3SHCYIKSGK7MTZ7PE7S6EDOFWLKDQ6RYYVMT7OHNQ4UJ774LE52AQCU"
 	// }
-
-	// Insert code after Step 1 code
 
 	// Create an Asset
 	// uncomment these imports at the top
@@ -216,7 +219,7 @@ func main() {
 	PrettyPrint(assetInfo)
 	// terminal output should look similar to this
 
-	// terminal outout should loiok similar to this
+	// terminal output should look similar to this
 	// Asset created AssetName: latinum
 	// Transaction ID: 4P4ACUIZTWYGFPSRZ6BPD4P64XZCYN2ZOHO33N4V7TYE2KWWDA4Q
 	// Transaction 4P4ACUIZTWYGFPSRZ6BPD4P64XZCYN2ZOHO33N4V7TYE2KWWDA4Q confirmed in round 4308303
@@ -235,8 +238,6 @@ func main() {
 	// 	"freezeaddr": "AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU",
 	// 	"clawbackaddr": "AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU"
 	// }
-
-	// Insert after Step 2's code
 
 	// Change Asset Manager from Account 2 to Account 1
 	manager = pks[1]
@@ -288,8 +289,7 @@ func main() {
 	// 	"clawbackaddr": "AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU"
 	// }
 
-	// Insert after step 3's code
-
+	// Opt-in
 	// Account 3 opts in to receive latinum
 	// Use previously set transaction parameters and update sending address to account 3
 	txn, err = transaction.MakeAssetAcceptanceTxn(pks[3], fee, firstRound, lastRound, note, genID, genHash, assetID)
@@ -330,8 +330,6 @@ func main() {
 	// 	"amount": 0,
 	// 	"frozen": false
 	// }
-
-	// Insert after step 4's code
 
 	// Transfer an Asset
 	// Send  10 latinum from Account 1 to Account 3
@@ -378,9 +376,7 @@ func main() {
 	// 	"frozen": false
 	// }
 
-	// Insert after step 5's code
 	// Freeze an Asset
-
 	// The freeze address (Account 2) Freeze's asset for Account 3.
 	newFreezeSetting := true
 	target := pks[3]
@@ -421,7 +417,6 @@ func main() {
 	// 	"frozen": true
 	// }
 
-	// Insert after Step 6's code
 	// Revoke an Asset
 	// The clawback address (Account 2) revokes 10 latinum from Account 3 (target)
 	// and places it back with Account 1 (creator).
@@ -478,8 +473,6 @@ func main() {
 	// 	"amount": 1000,
 	// 	"frozen": false
 	// }
-
-	// Insert after Step 7's code
 
 	// Destroy the asset
 	// Make sure all funds are back in the creator's account. Then use the
